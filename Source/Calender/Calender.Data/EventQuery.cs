@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Linq;
 using Calender.Domain.Queries;
 using Dapper;
 
 namespace Calender.Data
 {
+    using static ConnectionFunctions;
+
     public class EventQuery : IEventQuery
     {
-        readonly string connectionString;
+        readonly ConnectionString connStr;
 
-        public EventQuery(string connectionString)
+        public EventQuery(ConnectionString connStr)
         {
-            this.connectionString = connectionString;
+            this.connStr = connStr;
         }
 
         public EventModel Get(Guid id)
         {
-            using (var conn = new SqlConnection(this.connectionString))
-            {
-                return conn
-                    .Query<EventModel>(@"
+            return Connect(this.connStr,
+                conn =>
+                conn.Query<EventModel>(@"
                         SELECT TOP 1
                             Id,
                             Title,
@@ -30,8 +30,7 @@ namespace Calender.Data
                         FROM [dbo].[Events]
                         WHERE Id = @id",
                         new { id })
-                    .FirstOrDefault();
-            }
+                    .FirstOrDefault());
         }
     }
 }

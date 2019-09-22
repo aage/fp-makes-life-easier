@@ -1,63 +1,59 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Linq;
 using Calender.Domain.Commands;
 using Dapper;
 
 namespace Calender.Data
 {
+    using static ConnectionFunctions;
+
     public class EventRepository : IEventRepository
     {
-        readonly string connectionString;
+        readonly ConnectionString connStr;
 
-        public EventRepository(string connectionString)
+        public EventRepository(ConnectionString connStr)
         {
-            this.connectionString = connectionString;
+            this.connStr = connStr;
         }
 
         public void Add(Event @event)
         {
-            using (var conn = new SqlConnection(this.connectionString))
-            {
+            Connect(this.connStr,
+                conn =>
                 conn.Execute(@"
                     INSERT INTO [dbo].[Events] (Id, Title, Description, [When], [End])
                     VALUES (@Id, @Title, @Description, @When, @End)",
-                    new { @event.Id, @event.Title, @event.Description, @event.When, @event.End });
-            }
+                    new { @event.Id, @event.Title, @event.Description, @event.When, @event.End }));
         }
 
         public void Delete(Event @event)
         {
-            using (var conn = new SqlConnection(this.connectionString))
-            {
+            Connect(this.connStr,
+                conn =>
                 conn.Execute(@"
                     DELETE
                     FROM [dbo].[Events]
                     WHERE Id = @id",
-                    new { id = @event.Id });
-            }
+                    new { id = @event.Id }));
         }
 
         public bool EventExistsAtThisHour(DateTime when)
         {
-            using (var conn = new SqlConnection(this.connectionString))
-            {
-                return conn
+            return Connect(this.connStr,
+                conn => conn
                     .Query<int>(@"
                         SELECT COUNT(1)
                         FROM [dbo].[Events]
                         WHERE (@when BETWEEN [When] AND [End])
                             OR (@when BETWEEN [When] AND [End])",
                         new { when })
-                    .First() == 1;
-            }
+                    .First() == 1);
         }
 
         public Event Get(Guid id)
         {
-            using (var conn = new SqlConnection(this.connectionString))
-            {
-                return conn
+            return Connect(this.connStr,
+                conn => conn
                     .Query(@"
                         SELECT TOP 1
                             Id,
@@ -75,8 +71,7 @@ namespace Calender.Data
                             description: record.Description,
                             when: record.When,
                             end: record.End))
-                    .FirstOrDefault();
-            }
+                    .FirstOrDefault());
         }
     }
 }

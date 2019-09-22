@@ -1,35 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Calender.Domain.Queries;
 using Dapper;
 
 namespace Calender.Data
 {
+    using static ConnectionFunctions;
+
     public class EventsQuery : IEventsQuery
     {
-        readonly string connectionString;
+        readonly ConnectionString connStr;
 
-        public EventsQuery(string connectionString)
+        public EventsQuery(ConnectionString connStr)
         {
-            this.connectionString = connectionString;
+            this.connStr = connStr;
         }
 
         public IEnumerable<EventSummaryModel> Get()
         {
-            using (var conn = new SqlConnection(this.connectionString))
-            {
-                return conn
-                    .Query<EventSummaryModel>(@"
+            return Connect(this.connStr,
+                conn =>
+                conn.Query<EventSummaryModel>(@"
                         SELECT
                             Id,
                             Title,
                             [When],
                             [End]
                         FROM [dbo].[Events]")
-                    .ToList();
-            }
+                    .ToList());
         }
     }
 }
