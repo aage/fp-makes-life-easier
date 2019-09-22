@@ -24,12 +24,7 @@ namespace Calender.Api.Controllers
         public IActionResult Get(Guid id)
         {
             var @event = this.getEvent.Get(id);
-            if (@event == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(@event);
+            return @event.Match<IActionResult>(NotFound, Ok);
         }
 
         [HttpGet]

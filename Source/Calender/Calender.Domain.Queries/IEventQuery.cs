@@ -1,10 +1,11 @@
 ﻿using System;
 using Calender.Domain.Queries;
+using LaYumba.Functional;
 
 namespace Calender.Data
 {
     public interface IEventQuery
     {
-        EventModel Get(Guid id);
+        Option<EventModel> Get(Guid id);
     }
 }

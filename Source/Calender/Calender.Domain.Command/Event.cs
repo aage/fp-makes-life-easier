@@ -1,26 +1,26 @@
 ﻿using System;
+using Calender.Domain.ValueObjects;
 
 namespace Calender.Domain.Commands
 {
     public class Event
     {
-        public Event(Guid id,
-            string title,
-            string description, // optional
-            DateTime when,
-            DateTime end)
+        private Event(Guid id,
+            Subject subject,
+            Interval interval)
         {
             this.Id = id;
-            this.Title = title;
-            this.Description = description;
-            this.When = when;
-            this.End = end;
+            this.Subject = subject;
+            this.Interval = interval;
         }
 
-        public Guid Id { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public DateTime When { get; set; }
-        public DateTime End { get; set; }
+        public Guid Id { get; }
+        public Subject Subject { get; }
+        public Interval Interval { get; }
+
+        public static Func<
+            Guid, Subject, Interval,
+            Event> Create =
+            (id, subject, interval) => new Event(id, subject, interval);
     }
 }

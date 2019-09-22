@@ -1,4 +1,6 @@
-﻿namespace Calender.Domain.Commands
+﻿using LaYumba.Functional;
+
+namespace Calender.Domain.Commands
 {
     public class DeleteEventCommandHandler : ICommandHandler<DeleteEventCommand>
     {
@@ -11,13 +13,10 @@
 
         public void Handle(DeleteEventCommand command)
         {
-            var @event = this.repository.Get(command.Id);
-            if (@event == null)
-            {
-                throw new ValidationException(Error.EventDoesNotExist);
-            }
-
-            this.repository.Delete(@event);
+            var eventOption = this.repository.Get(command.Id);
+            eventOption.Match(
+                () => throw new ValidationException(Error.EventDoesNotExist),
+                (@event) => this.repository.Delete(@event));
         }
     }
 }

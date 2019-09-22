@@ -1,4 +1,5 @@
 ﻿using System;
+using Calender.Domain.ValueObjects;
 
 namespace Calender.Domain.Commands
 {
@@ -32,12 +33,16 @@ namespace Calender.Domain.Commands
                 throw new ValidationException(Error.HourAlreadyHasEvent);
             }
 
-            var @event = new Event(
+            // assume data is valid and force option creation, when rewritten using validation
+            // this won't be necessary
+            var @event = Event.Create(
                 Guid.NewGuid(),
-                command.Title,
-                command.Description,
-                command.When,
-                command.End);
+                Subject.Create(
+                    String100.Of(command.Title).ValueUnsafe(),
+                    String1000.Of(command.Description)),
+                Interval.Create(
+                    Moment.Of(command.When).ValueUnsafe(),
+                    Moment.Of(command.End).ValueUnsafe()).ValueUnsafe());
 
             this.repository.Add(@event);
         }

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Linq;
 using Calender.Domain.Commands;
+using Calender.Domain.ValueObjects;
 using Dapper;
+using LaYumba.Functional;
 
 namespace Calender.Data
 {
     using static ConnectionFunctions;
+    using static OptionFunctions;
 
     public class EventRepository : IEventRepository
     {
@@ -23,7 +26,14 @@ namespace Calender.Data
                 conn.Execute(@"
                     INSERT INTO [dbo].[Events] (Id, Title, Description, [When], [End])
                     VALUES (@Id, @Title, @Description, @When, @End)",
-                    new { @event.Id, @event.Title, @event.Description, @event.When, @event.End }));
+                    new
+                    {
+                        Id = @event.Id,
+                        Title = @event.Subject.Title.Value.ToString(),
+                        Description = @event.Subject.Description.Match(() => null, (d) => d.Value),
+                        When = @event.Interval.Start.Value,
+                        End = @event.Interval.End.Value
+                    }));
         }
 
         public void Delete(Event @event)
@@ -50,7 +60,7 @@ namespace Calender.Data
                     .First() == 1);
         }
 
-        public Event Get(Guid id)
+        public Option<Event> Get(Guid id)
         {
             return Connect(this.connStr,
                 conn => conn
@@ -65,12 +75,19 @@ namespace Calender.Data
                         WHERE Id = @id",
                         new { id })
                     .Select(record =>
-                        new Event(
-                            id: record.Id,
-                            title: record.Title,
-                            description: record.Description,
-                            when: record.When,
-                            end: record.End))
+                    {
+                        // assume all data is correct and force options creation
+                        var title = String100.Of((string)record.Title).ValueUnsafe();
+                        var descriptionOption = String1000.Of((string)record.Description);
+                        var subject = Subject.Create(title, descriptionOption);
+
+                        var when = Moment.Of((DateTime)record.When).ValueUnsafe();
+                        var end = Moment.Of((DateTime)record.End).ValueUnsafe();
+                        var interval = Interval.Create(when, end).ValueUnsafe();
+
+                        var @event = Event.Create(id, subject, interval);
+                        return @event;
+                    })
                     .FirstOrDefault());
         }
     }

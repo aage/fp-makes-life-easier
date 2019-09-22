@@ -2,6 +2,7 @@
 using System.Linq;
 using Calender.Domain.Queries;
 using Dapper;
+using LaYumba.Functional;
 
 namespace Calender.Data
 {
@@ -16,7 +17,7 @@ namespace Calender.Data
             this.connStr = connStr;
         }
 
-        public EventModel Get(Guid id)
+        public Option<EventModel> Get(Guid id)
         {
             return Connect(this.connStr,
                 conn =>
