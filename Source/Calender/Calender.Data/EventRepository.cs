@@ -8,7 +8,6 @@ using LaYumba.Functional;
 namespace Calender.Data
 {
     using static ConnectionFunctions;
-    using static OptionFunctions;
 
     public class EventRepository : IEventRepository
     {
