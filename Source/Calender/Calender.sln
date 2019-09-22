@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calender.Domain.Queries", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calender.Domain.Commands", "Calender.Domain.Command\Calender.Domain.Commands.csproj", "{3B71A6E5-4F60-4963-892A-C67179BD57C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calender.Domain.ValueObjects", "Calender.Domain.ValueObjects\Calender.Domain.ValueObjects.csproj", "{F8294031-9A32-4203-9F79-4E6251946351}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{3B71A6E5-4F60-4963-892A-C67179BD57C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B71A6E5-4F60-4963-892A-C67179BD57C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B71A6E5-4F60-4963-892A-C67179BD57C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8294031-9A32-4203-9F79-4E6251946351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8294031-9A32-4203-9F79-4E6251946351}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8294031-9A32-4203-9F79-4E6251946351}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8294031-9A32-4203-9F79-4E6251946351}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

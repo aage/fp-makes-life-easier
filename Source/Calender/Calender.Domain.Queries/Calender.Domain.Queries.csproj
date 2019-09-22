@@ -8,4 +8,8 @@
     <PackageReference Include="layumba.functional" Version="0.10.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Calender.Domain.ValueObjects\Calender.Domain.ValueObjects.csproj" />
+  </ItemGroup>
+
 </Project>

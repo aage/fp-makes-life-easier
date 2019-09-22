@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Calender.Domain.Command\Calender.Domain.Commands.csproj" />
     <ProjectReference Include="..\Calender.Domain.Queries\Calender.Domain.Queries.csproj" />
+    <ProjectReference Include="..\Calender.Domain.ValueObjects\Calender.Domain.ValueObjects.csproj" />
   </ItemGroup>
 
   <ItemGroup>
