@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Calender.Domain.Commands;
 using Calender.Domain.ValueObjects;
@@ -9,18 +10,11 @@ namespace Calender.Data
 {
     using static ConnectionFunctions;
 
-    public class EventRepository : IEventRepository
+    public static class EventFunctions
     {
-        readonly ConnectionString connStr;
-
-        public EventRepository(ConnectionString connStr)
-        {
-            this.connStr = connStr;
-        }
-
-        public void Add(Event @event)
-        {
-            Connect(this.connStr,
+        public static Action<ConnectionString, Event> Add =
+        (connStr, @event) => 
+            Connect(connStr,
                 conn =>
                 conn.Execute(@"
                     INSERT INTO [dbo].[Events] (Id, Title, Description, [When], [End])
@@ -33,35 +27,19 @@ namespace Calender.Data
                         When = @event.Interval.Start.Value,
                         End = @event.Interval.End.Value
                     }));
-        }
 
-        public void Delete(Event @event)
-        {
-            Connect(this.connStr,
+        public static Action<ConnectionString, Event> Delete =>
+            (connStr, @event) => Connect(connStr,
                 conn =>
                 conn.Execute(@"
                     DELETE
                     FROM [dbo].[Events]
                     WHERE Id = @id",
                     new { id = @event.Id }));
-        }
 
-        public bool EventExistsAtThisHour(DateTime when)
+        public static Option<Event> Get(ConnectionString connStr, Guid id)
         {
-            return Connect(this.connStr,
-                conn => conn
-                    .Query<int>(@"
-                        SELECT COUNT(1)
-                        FROM [dbo].[Events]
-                        WHERE (@when BETWEEN [When] AND [End])
-                            OR (@when BETWEEN [When] AND [End])",
-                        new { when })
-                    .First() == 1);
-        }
-
-        public Option<Event> Get(Guid id)
-        {
-            return Connect(this.connStr,
+            return Connect(connStr,
                 conn => conn
                     .Query(@"
                         SELECT TOP 1
@@ -88,6 +66,41 @@ namespace Calender.Data
                         return @event;
                     })
                     .FirstOrDefault());
+        }
+
+        public static IEnumerable<Event> GetForDay(ConnectionString connStr, DateTime thisDay)
+        {
+            // avoid sql breakage
+            thisDay = thisDay == default ? new DateTime(1900, 1, 1) : thisDay;
+
+            return Connect(connStr,
+                conn => conn
+                    .Query(@"
+                        SELECT
+                            Id,
+                            Title,
+                            Description,
+                            [When],
+                            [End]
+                        FROM [dbo].[Events]
+                        WHERE DATEDIFF(day, [When], @thisDay) = 0",
+                        new { thisDay })
+                    .Select(record =>
+                    {
+                        // assume all data is correct and force options creation
+                        var title = String100.Of((string)record.Title).ValueUnsafe();
+                        var descriptionOption = String1000.Of((string)record.Description);
+                        var subject = Subject.Create(title, descriptionOption);
+
+                        var when = Moment.Of((DateTime)record.When).ValueUnsafe();
+                        var end = Moment.Of((DateTime)record.End).ValueUnsafe();
+                        var interval = Interval.Create(when, end).ValueUnsafe();
+
+                        Guid id = record.Id;
+                        var @event = Event.Create(id, subject, interval);
+                        return @event;
+                    })
+                    .ToList());
         }
     }
 }

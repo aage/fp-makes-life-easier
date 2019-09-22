@@ -20,9 +20,15 @@ namespace Calender.Domain.ValueObjects
                 ? Some(new Moment(value.WithoutMinutes()))
                 : None;
 
+        public static Moment Today => new Moment(DateTime.Now);
+
         static bool IsValid(DateTime value) => value != default;
 
         public static implicit operator DateTime(Moment m) => m.Value;
+        public static bool operator <(Moment left, Moment right) => left.Value < right.Value;
+        public static bool operator >(Moment left, Moment right) => left.Value > right.Value;
+        public static bool operator !=(Moment left, Moment right) => left.Value != right.Value;
+        public static bool operator ==(Moment left, Moment right) => left.Value == right.Value;
     }
 
     internal static class DateTimeExt

@@ -1,7 +1,8 @@
 ﻿using Calender.Api.Controllers;
+using Calender.Api.IoC;
 using Calender.Api.Middleware;
 using Calender.Data;
-using Calender.Domain.Commands;
+using LaYumba.Functional;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,10 @@ using Swashbuckle.AspNetCore.Swagger;
 
 namespace Calender
 {
+    using static Calender.Data.ConnectionFunctions;
+    using static EventModelFunctions;
+    using static F;
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -28,18 +33,17 @@ namespace Calender
                 .AddControllersAsServices(); // make sure our custom controller invoking is used
 
             // dependency injection
-            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=Calender;Integrated Security=true;";
+            ConnectionString
+                connStr = "Server=(localdb)\\MSSQLLocalDB;Database=Calender;Integrated Security=true;";
 
-            var repository = new EventRepository(connectionString);
-
-            services.AddTransient(_ => 
+            services.AddTransient(_ =>
                 new EventsController(
-                    new EventsQuery(connectionString),
-                    new EventQuery(connectionString)));
+                    GetEventModel.Apply(connStr),
+                    GetEventModels.Apply(connStr)));
             services.AddTransient(_ =>
                 new EventController(
-                    new AddEventCommandHandler(repository),
-                    new DeleteEventCommandHandler(repository)));            
+                    AddEventIoc.WireUpAddEvent(connStr),
+                    DeleteEventIoc.WireUpDeleteEvent(connStr)));            
 
             // Swagger
             services.AddSwaggerGen(c =>

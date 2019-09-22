@@ -19,14 +19,6 @@ namespace Calender.Api.Middleware
         public async Task Invoke(HttpContext httpContext)
         {
             try { await next(httpContext); }
-            catch (ValidationException exn)
-            {
-                var statusCode = HttpStatusCode.BadRequest;
-                httpContext = SetErrorResponse(httpContext, statusCode);
-                byte[] data = Encoding.UTF8.GetBytes(exn.ToString());
-                httpContext.Response.ContentType = "application/text";
-                await httpContext.Response.Body.WriteAsync(data);
-            }
             catch (Exception exn)
             {
                 var statusCode = HttpStatusCode.InternalServerError;

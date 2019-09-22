@@ -1,18 +1,20 @@
 ﻿using System;
 using Calender.Domain.Commands;
+using LaYumba.Functional;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Calender.Api.Controllers
 {
     [Route("api/[controller]")]
     public class EventController : Controller
     {
-        readonly ICommandHandler<AddEventCommand> add;
-        readonly ICommandHandler<DeleteEventCommand> delete;
+        readonly Func<AddEventCommand, Validation<Event>> add;
+        readonly Func<DeleteEventCommand, Validation<Event>> delete;
 
         public EventController(
-            ICommandHandler<AddEventCommand> add,
-            ICommandHandler<DeleteEventCommand> delete)
+            Func<AddEventCommand, Validation<Event>> add,
+            Func<DeleteEventCommand, Validation<Event>> delete)
         {
             this.add = add;
             this.delete = delete;
@@ -25,9 +27,10 @@ namespace Calender.Api.Controllers
         {
             if (command == null) return BadRequest("Cannot read command");
 
-            this.add.Handle(command); // no feedback
-
-            return Ok();
+            var val = this.add(command);
+            return val.Match<IActionResult>(
+                (errors) => BadRequest(errors.Select(e => e.Message)),
+                (@event) => Ok(@event.Id));
         }
 
         [HttpDelete]
@@ -37,9 +40,10 @@ namespace Calender.Api.Controllers
         {
             if (command == null) return BadRequest("Cannot read command");
 
-            this.delete.Handle(command); // no feedback
-            
-            return Ok();
+            var val = this.delete(command);
+            return val.Match<IActionResult>(
+                (errors) => BadRequest(errors.Select(e => e.Message)),
+                (_) => Ok());
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
-using Calender.Data;
+using System.Collections.Generic;
 using Calender.Domain.Queries;
+using LaYumba.Functional;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Calender.Api.Controllers
@@ -8,13 +9,14 @@ namespace Calender.Api.Controllers
     [Route("api/[controller]")]
     public class EventsController : Controller
     {
-        readonly IEventsQuery getEvents;
-        readonly IEventQuery getEvent;
+        readonly Func<Guid, Option<EventModel>> getEvent;
+        readonly Func<IEnumerable<EventSummaryModel>> getEvents;
 
-        public EventsController(IEventsQuery getEvents, IEventQuery getEvent)
+        public EventsController(Func<Guid, Option<EventModel>> getEvent,
+            Func<IEnumerable<EventSummaryModel>> getEvents)
         {
-            this.getEvents = getEvents;
             this.getEvent = getEvent;
+            this.getEvents = getEvents;
         }
 
         [HttpGet("{id}")]
@@ -23,7 +25,7 @@ namespace Calender.Api.Controllers
 
         public IActionResult Get(Guid id)
         {
-            var @event = this.getEvent.Get(id);
+            var @event = this.getEvent(id);
             return @event.Match<IActionResult>(NotFound, Ok);
         }
 
@@ -31,7 +33,7 @@ namespace Calender.Api.Controllers
         [ProducesResponseType(200)]
         public IActionResult Get()
         {
-            var events = this.getEvents.Get();
+            var events = this.getEvents();
             return Ok(events);
         }
     }
