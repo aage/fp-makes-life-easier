@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="dapper" Version="2.0.4" />
+    <PackageReference Include="layumba.functional" Version="0.10.0" />
   </ItemGroup>
 
   <ItemGroup>

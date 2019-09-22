@@ -4,4 +4,8 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="layumba.functional" Version="0.10.0" />
+  </ItemGroup>
+
 </Project>
