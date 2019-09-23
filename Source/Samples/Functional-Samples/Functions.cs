@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Functional_Samples
 {
@@ -43,5 +44,15 @@ namespace Functional_Samples
             var version = new Version(fileVersionInfo);
             return version;
         }
+
+        // a simple and useful Higher Order Function
+        static R Pipe<T, R>(this T t, Func<T, R> f) => f(t);
+
+        // like this?
+        public static Func<Type, Version> GetVersionFp =
+            type => type.Assembly.Location
+                .Pipe(location => FileVersionInfo.GetVersionInfo(location))
+                .FileVersion
+                .Pipe(fileVersion => new Version(fileVersion));
     }
 }
