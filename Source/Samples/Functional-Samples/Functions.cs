@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Functional_Samples
 {
@@ -32,6 +33,15 @@ namespace Functional_Samples
             return int.TryParse(s, out i)
                 ? new ParseIntResult(result: i)
                 : new ParseIntResult(success: false);
+        }
+
+        // could this be rewritten?
+        public static Version GetFileVersion(Type type)
+        {
+            var location = type.Assembly.Location;
+            var fileVersionInfo = FileVersionInfo.GetVersionInfo(location).FileVersion;
+            var version = new Version(fileVersionInfo);
+            return version;
         }
     }
 }
