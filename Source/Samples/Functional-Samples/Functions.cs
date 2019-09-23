@@ -54,5 +54,20 @@ namespace Functional_Samples
                 .Pipe(location => FileVersionInfo.GetVersionInfo(location))
                 .FileVersion
                 .Pipe(fileVersion => new Version(fileVersion));
+
+        public static object GetUserInfo()
+        {
+            var users = new[] { new User { Id = 1, Age = 20, Name = "Foo" } };
+            var user = users.First();
+            return new { Age = user.Age, FullName = user.Name };
+        }
+
+        public static object GetUserInfoPipe()
+        {
+            var users = new[] { new User { Id = 1, Age = 20, Name = "Foo" } };
+            return users
+                .First()
+                .Pipe(u => new { Age = u.Age, FullName = u.Name });
+        }
     }
 }
