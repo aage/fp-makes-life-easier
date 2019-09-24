@@ -80,5 +80,14 @@ namespace Functional_Samples
                 Name = new string('a', count: int.MaxValue) // not a name
             };
         }
+
+        public static void ValidAgeElseException()
+        {
+            var age = new Age(100);
+            var user = new User
+            {
+                Age = age, // better, but not perfect
+            };
+        }
     }
 }
