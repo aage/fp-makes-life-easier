@@ -69,5 +69,16 @@ namespace Functional_Samples
                 .First()
                 .Pipe(u => new { Age = u.Age, FullName = u.Name });
         }
+
+        // This should not be possible
+        public static void InvalidAge()
+        {
+            var user = new User
+            {
+                Id = -100, // can an id be negative?
+                Age = 10000, // won't happen,
+                Name = new string('a', count: int.MaxValue) // not a name
+            };
+        }
     }
 }
