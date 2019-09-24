@@ -99,5 +99,25 @@ namespace Functional_Samples
                 None: () => new User(), 
                 Some: (age) => new User { Age = age });
         }
+
+        // map and bind (select and select many)
+        public static void DoSomethingWithOption()
+        {
+            // fake repository
+            Func<int, Option<User>> userById = (id) 
+                => id % 2 == 0 // when is even
+                    ? F.Some(new User())
+                    : F.None;
+
+            var userOption = userById(1);
+
+            // map for option is select for IEnumerable<T>
+            var shortNameOption = userOption
+                .Map(u => u.Name)
+                .Map(name => name.Substring(0,3));
+
+            // bind for option is select many for IEnumerable<T>
+            var addressesOption = userOption.Bind(u => u.Role);
+        }
     }
 }

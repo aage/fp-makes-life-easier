@@ -42,4 +42,19 @@ namespace Functional_Samples
 
         public R Match<R>(Func<R> None, Func<T, R> Some) => isSome ? Some(value) : None();
     }
+
+    public static class OptionExt
+    {
+        public static Option<R> Map<T, R>
+            (this Option<T> opt, Func<T, R> f) =>
+            opt.Match(
+                None: () => F.None, // continue with none
+                Some: (value) => F.Some(f(value))); // re-wrap result in some
+
+        public static Option<R> Bind<T, R>
+            (this Option<T> opt, Func<T, Option<R>> f) =>
+            opt.Match(
+                None: () => F.None, // continue with none
+                Some: (value) => f(value)); // function 'lifts' value itself
+    }
 }

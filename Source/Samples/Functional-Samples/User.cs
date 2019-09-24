@@ -9,5 +9,7 @@ namespace Functional_Samples
         public int Id { get; set; }
         public int Age { get; set; }
         public string Name { get; set; }
+        public Option<string> Role { get; set; }
+        public IEnumerable<string> EmailAddresses { get; set; }
     }
 }
