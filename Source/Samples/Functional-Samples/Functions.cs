@@ -81,13 +81,23 @@ namespace Functional_Samples
             };
         }
 
-        public static void ValidAgeElseException()
+        //public static void ValidAgeElseException()
+        //{
+        //    var age = new Age(100);
+        //    var user = new User
+        //    {
+        //        Age = age, // better, but not perfect
+        //    };
+        //}
+
+        // best
+        public static void ValidAgeElseDoesNotExist()
         {
-            var age = new Age(100);
-            var user = new User
-            {
-                Age = age, // better, but not perfect
-            };
+            var ageOption = Age.Of(100);
+            var user = ageOption.Match(
+                // forced to make a decision, no nulls! But, what should you do in this case?
+                None: () => new User(), 
+                Some: (age) => new User { Age = age });
         }
     }
 }
