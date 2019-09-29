@@ -2,7 +2,6 @@
 using System.Linq;
 using Calender.Data;
 using Calender.Domain.Commands;
-using Calender.Domain.ValueObjects;
 using LaYumba.Functional;
 
 namespace Calender.Api.IoC
@@ -18,17 +17,23 @@ namespace Calender.Api.IoC
             // Gather all necessary data and give to workflow.
             return cmd =>
             {
-                var eventsForDay = GetForDay(connStr, cmd.When);
-                var workflow = AddEvent.BuildWorkflow(
-                    Guid.NewGuid(),
-                    Moment.Today,
-                    eventsForDay);
-
+                var workflow = SetupWorkflow(connStr, cmd);
                 var persist = Add.Apply(connStr);
-                var result = workflow(cmd).Do(persist);
+
+                var result = workflow(cmd).Do(persist); // persist when valid
 
                 return result;
             };
+        }
+
+        private static Func<AddEventCommand, Validation<Event>> 
+            SetupWorkflow(ConnectionString connStr, AddEventCommand cmd)
+        {
+            var eventsForDay = GetForDay(connStr, cmd.When);
+            var workflow = AddEvent.BuildWorkflow(
+                Guid.NewGuid(),
+                eventsForDay);
+            return workflow;
         }
     }
 }
